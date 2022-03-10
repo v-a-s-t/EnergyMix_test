@@ -1,7 +1,7 @@
 /* TODO:
-    - Fix HTTP retry
     - Update BMRS API to filter XML file with all types of power instead of separate"
-    - clean up functions and OO
+    - Update LED distribution function to be use ints instead of floats.
+    - Clean up
 */
 
 //#define XML
