@@ -2,7 +2,7 @@
 
 ### Outline 
 
-EnergyMix is a project to make initial prototypes of the Inside concept from [Everyone Forever](https://www.everyoneforever.com/), the sister studio of [Universal Everything](https://www.universaleverything.com/).
+EnergyMix is a project to make initial prototypes of the [Inside concept](https://www.everyoneforever.com/a-lighting-product-which-reveals-its-current-energy-sources) from [Everyone Forever](https://www.everyoneforever.com/), the sister studio of [Universal Everything](https://www.universaleverything.com/).
 
 This prototype is based around the ESP32 and High density APA102/Dotstar addressable LED strips.
 
