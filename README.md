@@ -27,3 +27,5 @@ If you need to update the WiFi credentials or colours for each energy source, yo
 - [Level Shifter](https://www.amazon.co.uk/ARCELI-Channels-Converter-Bi-Directional-Shifter/dp/B07RDHR315/ref=sr_1_8?crid=1QDL958AQ3QDG&keywords=level+shifter&qid=1646923699&sprefix=level+shifte%2Caps%2C146&sr=8-8)
 
 ![Simple Wiring Diagram](https://github.com/v-a-s-t/EnergyMix_test/blob/main/schematic_simple.png?raw=true)
+
+This Project uses the Arduino libraries [CSV Parser](https://github.com/michalmonday/CSV-Parser-for-Arduino), [WiFi Manager](https://github.com/tzapu/WiFiManager), [Fast Led](https://github.com/FastLED/FastLED) and [Arduino JSON](https://github.com/bblanchon/ArduinoJson)
