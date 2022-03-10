@@ -22,8 +22,8 @@ Preferences prefs;
 
 //LED
 #include <FastLED.h>
-#define DATA_PIN 13
-#define CLOCK_PIN 14
+#define DATA_PIN 21
+#define CLOCK_PIN 22
 #define NUM_LEDS 40
 
 //Fuels used in visualisation
