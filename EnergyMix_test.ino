@@ -24,7 +24,9 @@ Preferences prefs;
 #include <FastLED.h>
 #define DATA_PIN 21
 #define CLOCK_PIN 22
-#define NUM_LEDS 40
+#define NUM_LEDS_IN_VISUAL 100
+#define PADDING 18 // 3 leds inbetween each energy
+#define TOTAL_LEDS NUM_LEDS_IN_VISUAL+PADDING
 
 //Fuels used in visualisation
 int LED_BRIGHTNESS = 20;
@@ -67,7 +69,7 @@ byte defaultColours[NUM_FUEL_VISUALISERS][3] = {
   28, 24, 28//coal 1c181c
 };
 
-CRGB leds[NUM_LEDS];
+CRGB leds[TOTAL_LEDS];
 
 #define BUTTON 0
 
