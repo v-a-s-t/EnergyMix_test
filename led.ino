@@ -16,14 +16,15 @@ void displayEnergyConsumption() {
     startingPoint = endingPoint;
     elementAmount = float(fuelVisualiserPercent[i] * NUM_LEDS_IN_VISUAL) + 0.5;
     endingPoint = endingPoint + elementAmount;
-    if (i > 0 && i < NUM_FUEL_VISUALISERS - 1) {
+    if (i > 0 && i < NUM_FUEL_VISUALISERS) {
       //if needs padding inbetween
-      for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / (NUM_FUEL_VISUALISERS - 1)); ledIndex++) {
+      for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
         //make sure the padding leds are turning off
         leds[ledIndex] = CRGB(0, 0, 0);
       }
       //add padding to the starting point
-      startingPoint = startingPoint + (PADDING / (NUM_FUEL_VISUALISERS - 1));
+      startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+      endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
     }
     for (int j = startingPoint; j < endingPoint; j++) {
       leds[j] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);

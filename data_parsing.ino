@@ -46,6 +46,8 @@ String data;
 float solarMW;
 
 const char* serverSolar = "https://api0.solar.sheffield.ac.uk/pvlive/api/v3/ggd/0";
+String serverSolar_history = "https://api0.solar.sheffield.ac.uk/pvlive/api/v3/ggd/0?start=";
+String solar_history_url;
 #ifdef XML
 String serverBMRS = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&FuelType=";
 String serverBMRS_end = "&ServiceType=xml";
@@ -75,6 +77,8 @@ int parseJSONtoInt(String dataIn) {
   const char* data_0_1 = data_0[1]; // "2022-02-24T10:30:00Z"
   int data_0_2 = data_0[2]; // 1
   int data_0_3 = data_0[3]; // 2450
+
+  set24hrPreviousTime(data_0_1);
 
   JsonArray meta = doc["meta"];
   const char* meta_0 = meta[0]; // "ggd_id"
@@ -143,6 +147,17 @@ void JSONSOLAR() {
   }
   // Serial.println(data);
   fuel_MW[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
+
+  //Parse historical data
+  solar_history_url = serverSolar_history + historicalTime + "&end=" + historicalTime;
+  historicalTime = "";
+  data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
+  if (data == "ERROR") {
+    //quick retry...
+    delay(2000);
+    data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
+  }
+  Serial.println(data);
 }
 
 

@@ -82,3 +82,21 @@ int getGlobalBrightness() {
   }
   return brightness;
 }
+
+void set24hrPreviousTime(const char * timeIn) {
+  historicalTime = stripTime(timeIn);
+}
+
+String stripTime(const char* timeIn) {
+  struct tm tmq = {0};
+  char buf[100];
+  // Convert to tm struct
+  strptime(timeIn, "%Y-%m-%dT%H:%M:%SZ", &tmq);
+  time_t t = mktime(&tmq);
+  struct tm* tm = localtime(&t);
+  tm->tm_mday -= 1;
+  time_t next = mktime(tm);
+  // Can convert to any other format
+  strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", localtime(&next));
+  return String(buf);
+}

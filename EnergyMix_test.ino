@@ -9,6 +9,8 @@
 #define NUM_FUEL_TYPES 19
 #define NUM_FUEL_VISUALISERS 7
 #include "certs.h"
+#include <time.h>
+#include <TimeLib.h>
 
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -25,13 +27,15 @@ Preferences prefs;
 #define DATA_PIN 21
 #define CLOCK_PIN 22
 #define NUM_LEDS_IN_VISUAL 100
-#define PADDING 18 // 3 leds inbetween each energy
+#define PADDING 21 // 3 leds inbetween each energy
 #define TOTAL_LEDS NUM_LEDS_IN_VISUAL+PADDING
 
 //Fuels used in visualisation
 int LED_BRIGHTNESS = 20;
 float fuelVisualiserPercent[NUM_FUEL_VISUALISERS];
 
+//24hr previous time based on latest sensor reading from solar API
+String historicalTime;
 
 
 
