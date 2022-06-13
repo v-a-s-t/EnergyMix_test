@@ -120,7 +120,7 @@ void XMLBMRS() {
 void CSVBMRS() {
   //Parse CSV from BMRS
   data = httpGETRequest(serverBMRS_CSV, root_ca_bmrs);
-  if (data == "") {
+  if (data == "ERROR") {
     //quick retry...
     Serial.println("Delay and retry");
     delay(20000);

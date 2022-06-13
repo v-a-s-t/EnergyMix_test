@@ -14,7 +14,7 @@ void displayEnergyConsumption() {
   Serial.println("Number of Leds per Element");
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     startingPoint = endingPoint;
-    elementAmount = float(fuelVisualiserPercent[i] * NUM_LEDS_IN_VISUAL) + 0.5;
+    elementAmount = int((fuelVisualiserPercent[i] * NUM_LEDS_IN_VISUAL) + 0.5);
     endingPoint = endingPoint + elementAmount;
     if (i > 0 && i < NUM_FUEL_VISUALISERS) {
       //if needs padding inbetween

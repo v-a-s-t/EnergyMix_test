@@ -6,7 +6,7 @@ String httpGETRequest(const char* serverName, const char* rootCert) {
 #else
   http.begin(serverName);
 #endif
-  http.setTimeout(20000);
+  http.setTimeout(30000);
 
   // Send HTTP POST request
   int httpResponseCode = http.GET();
