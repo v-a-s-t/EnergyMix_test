@@ -20,14 +20,14 @@ void displayEnergyConsumption() {
       //if needs padding inbetween
       for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
         //make sure the padding leds are turning off
-        leds[ledIndex] = CRGB(0, 0, 0);
+        leds[ledIndex + OFFSET] = CRGB(0, 0, 0);
       }
       //add padding to the starting point
       startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
       endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
     }
     for (int j = startingPoint; j < endingPoint; j++) {
-      leds[j] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
+      leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
     }
 
     Serial.print(fuelVisual_labels[i]);
@@ -48,11 +48,20 @@ void ledSend() {
 
 void ledStartupAnimation() {
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
-    for (int j = 0; j < TOTAL_LEDS; j++) {
+    for (int j = OFFSET; j < TOTAL_LEDS; j++) {
       leds[j] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
-      delay(30);
+      delay(20);
       FastLED.show();
     }
     delay(100);
   }
+}
+
+void captivePortalAnimation() {
+  for (int j = OFFSET; j < TOTAL_LEDS; j++) {
+    leds[j] = CRGB(20, 20, 20);
+    delay(10);
+    FastLED.show();
+  }
+  FastLED.clear();
 }

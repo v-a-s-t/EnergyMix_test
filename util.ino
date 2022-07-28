@@ -1,7 +1,12 @@
 void pinSetup() {
   Serial.begin(115200);
-  pinMode(BUTTON, INPUT_PULLUP);
+  // pinMode(BUTTON, INPUT_PULLUP);
   delay(500); //delay so can press the button
+
+  touchConfig.setFeature(ButtonConfig::kFeatureClick);
+  touchConfig.setFeature(ButtonConfig::kFeatureLongPress);
+  touchConfig.setEventHandler(handleTouchEvent);
+  touchConfig.setLongPressDelay(LONG_TOUCH);
 
 }
 
@@ -78,7 +83,12 @@ int getGlobalBrightness() {
   prefs.end();
   if (brightness == 0) {
     Serial.println("setting Global brightness in preferences to default");
-    setGlobalBrightness(100);
+    setGlobalBrightness(20);
+  } else {
+    if (brightness > MAXBRIGHTNESS) {
+      brightness = MAXBRIGHTNESS;
+      setGlobalBrightness(brightness);
+    }
   }
   return brightness;
 }
@@ -99,4 +109,26 @@ String stripTime(const char* timeIn) {
   // Can convert to any other format
   strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", localtime(&next));
   return String(buf);
+}
+
+// button functions
+void handleTouchEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+  Serial.println(button->getId());
+
+  switch (eventType) {
+    case AceButton::kEventPressed:
+      Serial.println("TOUCH: pressed");
+      break;
+    case AceButton::kEventLongPressed:
+      Serial.println("TOUCH: Long pressed");
+      captivePortalAnimation();
+      wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
+      break;
+    case AceButton::kEventReleased:
+      Serial.println("TOUCH: released");
+      break;
+    case AceButton::kEventClicked:
+      Serial.println("TOUCH: clicked");
+      break;
+  }
 }

@@ -44,9 +44,9 @@ int32_t *fuelConsumption;
 
 String data;
 float solarMW;
-
-const char* serverSolar = "https://api0.solar.sheffield.ac.uk/pvlive/api/v3/ggd/0";
-String serverSolar_history = "https://api0.solar.sheffield.ac.uk/pvlive/api/v3/ggd/0?start=";
+//https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0
+const char* serverSolar = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0";
+String serverSolar_history = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/ggd/0?start=";
 String solar_history_url;
 #ifdef XML
 String serverBMRS = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&FuelType=";
@@ -76,17 +76,15 @@ int parseJSONtoInt(String dataIn) {
   int data_0_0 = data_0[0]; // 0
   const char* data_0_1 = data_0[1]; // "2022-02-24T10:30:00Z"
   int data_0_2 = data_0[2]; // 1
-  int data_0_3 = data_0[3]; // 2450
-
-  set24hrPreviousTime(data_0_1);
+  //set24hrPreviousTime(data_0_1);
 
   JsonArray meta = doc["meta"];
   const char* meta_0 = meta[0]; // "ggd_id"
   const char* meta_1 = meta[1]; // "datetime_gmt"
   const char* meta_2 = meta[2]; // "n_ggds"
-  const char* meta_3 = meta[3]; // "generation_mw"
+  //const char* meta_3 = meta[3]; // "generation_mw"
 
-  return data_0_3;
+  return data_0_2;
 }
 #ifdef XML
 int parseXMLtoInt(String dataIn) {
@@ -117,7 +115,9 @@ void XMLBMRS() {
   }
 }
 #else
+bool skipUpdate = false;
 void CSVBMRS() {
+  skipUpdate = false;
   //Parse CSV from BMRS
   data = httpGETRequest(serverBMRS_CSV, root_ca_bmrs);
   if (data == "ERROR") {
@@ -133,31 +133,35 @@ void CSVBMRS() {
     }
   } else {
     Serial.println("Skipping update this time as there was an error with the request");
+    skipUpdate = true;
   }
 }
 #endif
 
 void JSONSOLAR() {
-  //Parse JSON from solar
-  data = httpGETRequest(serverSolar, root_ca_solar);
-  if (data == "ERROR") {
-    //quick retry...
-    delay(2000);
+  if (skipUpdate == false) {
+    //Parse JSON from solar
     data = httpGETRequest(serverSolar, root_ca_solar);
-  }
-  // Serial.println(data);
-  fuel_MW[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
-
-  //Parse historical data
-  solar_history_url = serverSolar_history + historicalTime + "&end=" + historicalTime;
-  historicalTime = "";
-  data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
-  if (data == "ERROR") {
-    //quick retry...
-    delay(2000);
+    if (data == "ERROR") {
+      //quick retry...
+      delay(2000);
+      data = httpGETRequest(serverSolar, root_ca_solar);
+    }
+    // Serial.println(data);
+    fuel_MW[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
+/*
+    //Parse historical data
+    solar_history_url = serverSolar_history + historicalTime + "&end=" + historicalTime;
+    historicalTime = "";
     data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
+    if (data == "ERROR") {
+      //quick retry...
+      delay(2000);
+      data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
+    }
+    Serial.println(data);
+    */
   }
-  Serial.println(data);
 }
 
 
