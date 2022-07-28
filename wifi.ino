@@ -6,7 +6,7 @@ String httpGETRequest(const char* serverName, const char* rootCert) {
 #else
   http.begin(serverName);
 #endif
-  http.setTimeout(20000);
+  http.setTimeout(30000);
 
   // Send HTTP POST request
   int httpResponseCode = http.GET();
@@ -21,7 +21,7 @@ String httpGETRequest(const char* serverName, const char* rootCert) {
   else {
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
-    payload == "ERROR";
+    payload = "ERROR";
   }
   // Free resources
   http.end();
@@ -75,17 +75,17 @@ void wifiSetup() {
   // WiFi manager
   setupParameters();
 
-  String wifiName = "EnergyMix-" + generateID();
+  wifiName = "EnergyMix-" + generateID();
 
-  if (digitalRead(BUTTON) == LOW) {
-    wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
-  } else {
+  // if (digitalRead(BUTTON) == LOW) {
+  //  wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
+  //} else {
 
-    bool res = wm.autoConnect(wifiName.c_str(), "solar-wind-hydro");
-    if (!res) {
-      ESP.restart();
-    }
+  bool res = wm.autoConnect(wifiName.c_str(), "solar-wind-hydro");
+  if (!res) {
+    ESP.restart();
   }
+  // }
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);

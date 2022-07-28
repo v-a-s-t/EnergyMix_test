@@ -9,6 +9,8 @@
 #define NUM_FUEL_TYPES 19
 #define NUM_FUEL_VISUALISERS 7
 #include "certs.h"
+#include <time.h>
+#include <TimeLib.h>
 
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -22,14 +24,53 @@ Preferences prefs;
 
 //LED
 #include <FastLED.h>
-#define DATA_PIN 21
-#define CLOCK_PIN 22
-#define NUM_LEDS 40
+#define DATA_PIN 13
+#define CLOCK_PIN 14
+#define NUM_LEDS_IN_VISUAL 100
+#define PADDING 21 // 3 leds inbetween each energy
+#define OFFSET 1 // start offset
+#define TOTAL_LEDS NUM_LEDS_IN_VISUAL+PADDING+OFFSET
+
+
+//Button
+#define CAPTOUCH T7
+#define LONG_TOUCH 2000
+int TOUCH_THRESHOLD = 60;
+int TOUCH_HYSTERESIS = 20;
+#include <AceButton.h>
+using namespace ace_button;
+
+// Touch settings and config
+class CapacitiveConfig: public ButtonConfig {
+  public:
+    uint8_t _pin;
+    uint16_t _threshold;
+    CapacitiveConfig(uint8_t pin, uint16_t threshold) {
+      _pin = pin;
+      _threshold = threshold;
+    }
+    void setThreshold(uint16_t CapThreshold) {
+      _threshold = CapThreshold;
+    }
+  protected:
+    int readButton(uint8_t /*pin*/) override {
+      uint16_t val = touchRead(_pin);
+      return (val < _threshold) ? LOW : HIGH;
+    }
+};
+
+CapacitiveConfig touchConfig(CAPTOUCH, TOUCH_THRESHOLD);
+AceButton buttonTouch(&touchConfig);
+
+void handleButtonEvent(AceButton*, uint8_t, uint8_t);
 
 //Fuels used in visualisation
-int LED_BRIGHTNESS = 20;
+int LED_BRIGHTNESS = 40;
+#define MAXBRIGHTNESS 100
 float fuelVisualiserPercent[NUM_FUEL_VISUALISERS];
 
+//24hr previous time based on latest sensor reading from solar API
+String historicalTime;
 
 
 
@@ -67,12 +108,15 @@ byte defaultColours[NUM_FUEL_VISUALISERS][3] = {
   28, 24, 28//coal 1c181c
 };
 
-CRGB leds[NUM_LEDS];
+CRGB leds[TOTAL_LEDS];
 
-#define BUTTON 0
 
-unsigned long lastTime = 30000;
-unsigned long timerDelay = 30000;
+unsigned long lastTime = 120000;
+unsigned long timerDelay = 120000;
+
+//captive portal variables
+String wifiName;
+bool isCaptivePortal = false;
 
 void setup() {
   pinSetup();
@@ -83,6 +127,7 @@ void setup() {
 }
 
 void loop() {
+  buttonTouch.check();
   if ((millis() - lastTime) > timerDelay) {
     if (WiFi.status() == WL_CONNECTED) {
       getData();
