@@ -40,6 +40,16 @@ int TOUCH_HYSTERESIS = 20;
 #include <AceButton.h>
 using namespace ace_button;
 
+//Timer
+unsigned long lastTime = 0;
+#define TIMER_DELAY 120000
+
+//Historical data
+#define HISTORICAL_DATA_POINTS 24 //24 hours
+int HISTORICAL_DATA_COUNTS_PER_LOG = 60 / (TIMER_DELAY / 60000);
+int historicalDataCounter = 0;
+bool firstHistoricalData = true;
+
 // Touch settings and config
 class CapacitiveConfig: public ButtonConfig {
   public:
@@ -68,11 +78,7 @@ void handleButtonEvent(AceButton*, uint8_t, uint8_t);
 int LED_BRIGHTNESS = 40;
 #define MAXBRIGHTNESS 100
 float fuelVisualiserPercent[NUM_FUEL_VISUALISERS];
-
-//24hr previous time based on latest sensor reading from solar API
-String historicalTime;
-
-
+byte fuelUsageInPoints[NUM_FUEL_VISUALISERS];
 
 enum fuelVisuals {
   led_solar,
@@ -111,9 +117,6 @@ byte defaultColours[NUM_FUEL_VISUALISERS][3] = {
 CRGB leds[TOTAL_LEDS];
 
 
-unsigned long lastTime = 120000;
-unsigned long timerDelay = 120000;
-
 //captive portal variables
 String wifiName;
 bool isCaptivePortal = false;
@@ -124,14 +127,18 @@ void setup() {
   ledSetup();
   ledStartupAnimation();
   wifiSetup();
+  //
+  //initHistoricalData();
 }
 
 void loop() {
   buttonTouch.check();
-  if ((millis() - lastTime) > timerDelay) {
+  if ((millis() - lastTime) > TIMER_DELAY || firstHistoricalData == true) {
     if (WiFi.status() == WL_CONNECTED) {
       getData();
       calculateEnergyConsumption();
+      historicalDataHandler();
+      printOutHistoricalData();
       displayEnergyConsumption();
     } else {
       Serial.println("WiFi Disconnected");

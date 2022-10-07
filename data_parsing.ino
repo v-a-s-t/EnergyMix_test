@@ -46,8 +46,6 @@ String data;
 float solarMW;
 //https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0
 const char* serverSolar = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0";
-String serverSolar_history = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/ggd/0?start=";
-String solar_history_url;
 #ifdef XML
 String serverBMRS = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&FuelType=";
 String serverBMRS_end = "&ServiceType=xml";
@@ -149,18 +147,6 @@ void JSONSOLAR() {
     }
     // Serial.println(data);
     fuel_MW[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
-/*
-    //Parse historical data
-    solar_history_url = serverSolar_history + historicalTime + "&end=" + historicalTime;
-    historicalTime = "";
-    data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
-    if (data == "ERROR") {
-      //quick retry...
-      delay(2000);
-      data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
-    }
-    Serial.println(data);
-    */
   }
 }
 
@@ -206,12 +192,11 @@ void calculateEnergyConsumption() {
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     Serial.print(fuelVisual_labels[i]);
     Serial.print(": ");
-    Serial.print(int((fuelVisualiserPercent[i] * 100.0) + 0.5));
+    fuelUsageInPoints[i] = byte((fuelVisualiserPercent[i] * 100.0) + 0.5);
+    Serial.print(fuelUsageInPoints[i]);
     Serial.println("%");
     Serial.println();
   }
-
-
 }
 
 void calculateAllEnergyConsumption() {

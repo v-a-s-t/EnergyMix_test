@@ -93,10 +93,6 @@ int getGlobalBrightness() {
   return brightness;
 }
 
-void set24hrPreviousTime(const char * timeIn) {
-  historicalTime = stripTime(timeIn);
-}
-
 String stripTime(const char* timeIn) {
   struct tm tmq = {0};
   char buf[100];
