@@ -26,7 +26,7 @@ void initHistoricalData() {
   prefs.begin("historicalData");
   byte fuelArrayNew[HISTORICAL_DATA_POINTS] = {};
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
-    prefs.putBytes(fuelVisual_labels[i], fuelArray, HISTORICAL_DATA_POINTS);
+    prefs.putBytes(fuelVisual_labels[i], fuelArrayNew, HISTORICAL_DATA_POINTS);
   }
   prefs.end();
 }

@@ -192,7 +192,7 @@ void calculateEnergyConsumption() {
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     Serial.print(fuelVisual_labels[i]);
     Serial.print(": ");
-    fuelUsageInPoints[i] = byte((fuelVisualiserPercent[i] * 100.0) + 0.5);
+    fuelUsageInPoints[i] = int((fuelVisualiserPercent[i] * 100.0) + 0.5);
     Serial.print(fuelUsageInPoints[i]);
     Serial.println("%");
     Serial.println();
