@@ -1,6 +1,5 @@
 void updateHistoricalData(byte currentValues[]) {
   prefs.begin("historicalData");
-  byte fuelArray[HISTORICAL_DATA_POINTS];
   if (firstHistoricalData) {
     //Replace the hour 0 reading with the latest reading on first power up
     for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
@@ -25,7 +24,7 @@ void updateHistoricalData(byte currentValues[]) {
 
 void initHistoricalData() {
   prefs.begin("historicalData");
-  byte fuelArray[HISTORICAL_DATA_POINTS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  byte fuelArrayNew[HISTORICAL_DATA_POINTS] = {};
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     prefs.putBytes(fuelVisual_labels[i], fuelArray, HISTORICAL_DATA_POINTS);
   }
@@ -34,7 +33,6 @@ void initHistoricalData() {
 
 void printOutHistoricalData() {
   prefs.begin("historicalData");
-  byte fuelArray[HISTORICAL_DATA_POINTS];
   Serial.println("Historical Data Print out. Hourly, starting now to 24 hours ago");
   Serial.println("-------------------------------------------------------------");
   Serial.println();
@@ -44,7 +42,7 @@ void printOutHistoricalData() {
     Serial.print(": " );
     Serial.println(fuelArray[0]);
     Serial.println();
-    for (int j = 0; j > HISTORICAL_DATA_POINTS; j++) {
+    for (int j = 0; j < HISTORICAL_DATA_POINTS; j++) {
       for (int k = 0; k < fuelArray[j]; k++) {
         Serial.print("-");
       }
@@ -56,9 +54,13 @@ void printOutHistoricalData() {
 }
 
 void historicalDataHandler() {
-  if (historicalDataCounter % HISTORICAL_DATA_POINTS == 0) {
+  //if (historicalDataCounter == 0) {
+    Serial.println("Saving new historical data!");
     updateHistoricalData(fuelUsageInPoints);
     firstHistoricalData = false;
-  }
-  historicalDataCounter++;
+ // }
+ // historicalDataCounter++;
+ // if (historicalDataCounter == HISTORICAL_DATA_COUNTS_PER_LOG) {
+ //   historicalDataCounter = 0 ;
+ // }
 }

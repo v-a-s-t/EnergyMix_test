@@ -42,13 +42,15 @@ using namespace ace_button;
 
 //Timer
 unsigned long lastTime = 0;
-#define TIMER_DELAY 120000
+#define TIMER_DELAY 300000 //5 minutes
 
 //Historical data
-#define HISTORICAL_DATA_POINTS 24 //24 hours
-int HISTORICAL_DATA_COUNTS_PER_LOG = 60 / (TIMER_DELAY / 60000);
+const int HISTORICAL_DATA_POINTS = 86400 / (TIMER_DELAY / 1000); //24 hours, every 5 minutes
+const int HISTORICAL_DATA_COUNTS_PER_LOG = 60 / (TIMER_DELAY / 60000);
+//int HISTORICAL_DATA_COUNTS_PER_LOG = 1;
 int historicalDataCounter = 0;
 bool firstHistoricalData = true;
+byte fuelArray[HISTORICAL_DATA_POINTS];
 
 // Touch settings and config
 class CapacitiveConfig: public ButtonConfig {
@@ -127,11 +129,11 @@ void setup() {
   ledSetup();
   ledStartupAnimation();
   wifiSetup();
-  //
-  //initHistoricalData();
+ // initHistoricalData();
 }
 
 void loop() {
+
   buttonTouch.check();
   if ((millis() - lastTime) > TIMER_DELAY || firstHistoricalData == true) {
     if (WiFi.status() == WL_CONNECTED) {
