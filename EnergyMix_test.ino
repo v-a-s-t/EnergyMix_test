@@ -129,7 +129,7 @@ void setup() {
   ledSetup();
   ledStartupAnimation();
   wifiSetup();
- // initHistoricalData();
+  //initHistoricalData();
 }
 
 void loop() {
@@ -139,6 +139,7 @@ void loop() {
     if (WiFi.status() == WL_CONNECTED) {
       getData();
       calculateEnergyConsumption();
+      errorCheckData();
       historicalDataHandler();
       printOutHistoricalData();
       displayEnergyConsumption();

@@ -131,6 +131,9 @@ void CSVBMRS() {
     }
   } else {
     Serial.println("Skipping update this time as there was an error with the request");
+    for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
+      fuel_MW[i] = 0;
+    }
     skipUpdate = true;
   }
 }
@@ -145,8 +148,19 @@ void JSONSOLAR() {
       delay(2000);
       data = httpGETRequest(serverSolar, root_ca_solar);
     }
-    // Serial.println(data);
-    fuel_MW[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
+    if (data != "ERROR") {
+      // Serial.println(data);
+      fuel_MW[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
+    } else {
+      for (byte i = 0; i < NUM_FUEL_TYPES; i ++) {
+        fuel_MW[i] = 0;
+        skipUpdate = true;
+      }
+    }
+  } else {
+    for (byte i = 0; i < NUM_FUEL_TYPES; i ++) {
+      fuel_MW[i] = 0;
+    }
   }
 }
 
@@ -245,4 +259,18 @@ void getData() {
   CSVBMRS();
 #endif
   JSONSOLAR();
+}
+
+void errorCheckData() {
+  Serial.println("error checking");
+  for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+    if (fuelUsageInPoints[i] < 0 || fuelUsageInPoints[i] > 100) {
+      for (byte j = 0; j < NUM_FUEL_VISUALISERS; j ++) {
+        fuelUsageInPoints[j] = 0;
+        Serial.println("found data error!");
+      }
+      skipUpdate = true;
+    }
+  }
+  Serial.println("error check finished");
 }

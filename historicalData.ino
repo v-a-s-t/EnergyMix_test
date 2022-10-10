@@ -2,17 +2,17 @@ void updateHistoricalData(byte currentValues[]) {
   prefs.begin("historicalData");
   if (firstHistoricalData) {
     //Replace the hour 0 reading with the latest reading on first power up
-    for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+    for (int i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
       prefs.getBytes(fuelVisual_labels[i], fuelArray, HISTORICAL_DATA_POINTS);
       fuelArray[0] = currentValues[i];
       prefs.putBytes(fuelVisual_labels[i], fuelArray, HISTORICAL_DATA_POINTS);
     }
   } else {
     //Ring buffer of historical data
-    for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+    for (int i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
       prefs.getBytes(fuelVisual_labels[i], fuelArray, HISTORICAL_DATA_POINTS);
-      byte last = fuelArray[HISTORICAL_DATA_POINTS - 1];
-      for (byte j = HISTORICAL_DATA_POINTS - 1; j > 0; j--) {
+      int last = fuelArray[HISTORICAL_DATA_POINTS - 1];
+      for (int j = HISTORICAL_DATA_POINTS - 1; j > 0; j--) {
         fuelArray[j] = fuelArray[j - 1];
       }
       fuelArray[0] = currentValues[i];
@@ -25,7 +25,7 @@ void updateHistoricalData(byte currentValues[]) {
 void initHistoricalData() {
   prefs.begin("historicalData");
   byte fuelArrayNew[HISTORICAL_DATA_POINTS] = {};
-  for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+  for (int i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     prefs.putBytes(fuelVisual_labels[i], fuelArrayNew, HISTORICAL_DATA_POINTS);
   }
   prefs.end();
@@ -54,13 +54,15 @@ void printOutHistoricalData() {
 }
 
 void historicalDataHandler() {
-  //if (historicalDataCounter == 0) {
+  if (skipUpdate == false) {
+    //if (historicalDataCounter == 0) {
     Serial.println("Saving new historical data!");
     updateHistoricalData(fuelUsageInPoints);
     firstHistoricalData = false;
- // }
- // historicalDataCounter++;
- // if (historicalDataCounter == HISTORICAL_DATA_COUNTS_PER_LOG) {
- //   historicalDataCounter = 0 ;
- // }
+    // }
+    // historicalDataCounter++;
+    // if (historicalDataCounter == HISTORICAL_DATA_COUNTS_PER_LOG) {
+    //   historicalDataCounter = 0 ;
+    // }
+  }
 }
