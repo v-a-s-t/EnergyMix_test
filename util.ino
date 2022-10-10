@@ -93,20 +93,6 @@ int getGlobalBrightness() {
   return brightness;
 }
 
-String stripTime(const char* timeIn) {
-  struct tm tmq = {0};
-  char buf[100];
-  // Convert to tm struct
-  strptime(timeIn, "%Y-%m-%dT%H:%M:%SZ", &tmq);
-  time_t t = mktime(&tmq);
-  struct tm* tm = localtime(&t);
-  tm->tm_mday -= 1;
-  time_t next = mktime(tm);
-  // Can convert to any other format
-  strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", localtime(&next));
-  return String(buf);
-}
-
 // button functions
 void handleTouchEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   Serial.println(button->getId());

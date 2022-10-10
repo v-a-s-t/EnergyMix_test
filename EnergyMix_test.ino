@@ -9,8 +9,7 @@
 #define NUM_FUEL_TYPES 19
 #define NUM_FUEL_VISUALISERS 7
 #include "certs.h"
-#include <time.h>
-#include <TimeLib.h>
+
 
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -51,6 +50,7 @@ const int HISTORICAL_DATA_COUNTS_PER_LOG = 60 / (TIMER_DELAY / 60000);
 int historicalDataCounter = 0;
 bool firstHistoricalData = true;
 byte fuelArray[HISTORICAL_DATA_POINTS];
+byte historicalDataPoints[NUM_FUEL_VISUALISERS][HISTORICAL_DATA_POINTS];
 
 // Touch settings and config
 class CapacitiveConfig: public ButtonConfig {
@@ -142,11 +142,14 @@ void loop() {
       errorCheckData();
       historicalDataHandler();
       printOutHistoricalData();
-      displayEnergyConsumption();
+      // displayEnergyConsumption();
+      displayHistoricalEnergyConsumption();
+     
     } else {
       Serial.println("WiFi Disconnected");
     }
     lastTime = millis();
   }
+  displayUpdate();
   ledSend();
 }

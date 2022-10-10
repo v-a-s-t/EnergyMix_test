@@ -31,6 +31,18 @@ void initHistoricalData() {
   prefs.end();
 }
 
+void populateHistoricalDataArray() {
+  prefs.begin("historicalData");
+  //Ring buffer of historical data
+  Serial.println("getting historical data");
+  for (int i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+    prefs.getBytes(fuelVisual_labels[i], historicalDataPoints[i], HISTORICAL_DATA_POINTS);
+  }
+  prefs.end();
+  Serial.println("got historical data");
+}
+
+
 void printOutHistoricalData() {
   prefs.begin("historicalData");
   Serial.println("Historical Data Print out. Hourly, starting now to 24 hours ago");
