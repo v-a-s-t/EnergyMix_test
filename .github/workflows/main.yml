@@ -34,6 +34,7 @@ jobs:
           arduino-cli lib install "WiFiManager"
           arduino-cli lib install "ArduinoJson"
           arduino-cli lib install "CSV Parser"
+          arduino-cli lib install "AceButton"
    
       - name: Compile
         run: |
