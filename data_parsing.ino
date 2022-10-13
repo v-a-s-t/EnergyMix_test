@@ -55,11 +55,11 @@ const char* serverBMRS_CSV = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?AP
 
 // 8 fuels from BMRS and 1 from solar report
 String BMRS_fuelTypes[NUM_FUEL_TYPES - 1] = {"CCGT", "OCGT", "OIL", "COAL", "NUCLEAR", "WIND", "PS", "NPSHYD", "OTHER", "INTFR", "INTIRL", "INTNED", "INTEW", "BIOMASS", "INTNEM", "INTELEC", "INTIFA2", "INTNSL"};
-int fuel_MW[NUM_FUEL_TYPES];
+uint32_t fuel_MW[NUM_FUEL_TYPES];
 double totalEnergy;
 float fuel_percent[NUM_FUEL_TYPES];
 
-int parseJSONtoInt(String dataIn) {
+uint32_t parseJSONtoInt(String dataIn) {
   StaticJsonDocument<384> doc;
 
   DeserializationError error = deserializeJson(doc, dataIn);
@@ -71,9 +71,9 @@ int parseJSONtoInt(String dataIn) {
   }
 
   JsonArray data_0 = doc["data"][0];
-  int data_0_0 = data_0[0]; // 0
+  uint32_t data_0_0 = data_0[0]; // 0
   const char* data_0_1 = data_0[1]; // "2022-02-24T10:30:00Z"
-  int data_0_2 = data_0[2]; // 1
+  uint32_t data_0_2 = data_0[2]; // 1
   //set24hrPreviousTime(data_0_1);
 
   JsonArray meta = doc["meta"];
@@ -180,7 +180,7 @@ void parseCSV(String dataIn) {
   }
 }
 
-int getFuelValue(int id) {
+uint32_t getFuelValue(int id) {
   Serial.print(FuelNames[id]);
   Serial.print(": ");
   Serial.println(fuelConsumption[id]);
@@ -229,10 +229,10 @@ void calculateAllEnergyConsumption() {
   for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
     Serial.print(BMRS_fuelTypes[i]);
     Serial.print(": ");
-    Serial.print(int(fuel_percent[i] * 100));
+    Serial.print(uint32_t(fuel_percent[i] * 100));
     Serial.print("%");
     Serial.println();
-    int line = int(fuel_percent[i] * 100);
+    uint32_t line = int(fuel_percent[i] * 100);
     for (int i = 0 ; i < line; i++) {
       Serial.print("-");
     }

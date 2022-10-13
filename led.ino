@@ -14,7 +14,7 @@ void displayEnergyConsumption() {
   Serial.println("Number of Leds per Element");
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     startingPoint = endingPoint;
-    elementAmount = int((fuelVisualiserPercent[i] * NUM_LEDS_IN_VISUAL) + 0.5);
+    elementAmount = uint32_t((fuelVisualiserPercent[i] * NUM_LEDS_IN_VISUAL) + 0.5);
     endingPoint = endingPoint + elementAmount;
     if (i > 0 && i < NUM_FUEL_VISUALISERS) {
       //if needs padding inbetween
@@ -56,7 +56,7 @@ void displayHistoricalEnergyConsumption() {
       startingPoint = endingPoint;
       elementAmount = historicalDataPoints[i][k];
       endingPoint = endingPoint + elementAmount;
-      if (endingPoint > startingPoint) {
+      //if (endingPoint >= startingPoint) {
         if (i > 0 && i < NUM_FUEL_VISUALISERS) {
           //if needs padding inbetween
           for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
@@ -70,9 +70,9 @@ void displayHistoricalEnergyConsumption() {
         for (int j = startingPoint; j < endingPoint; j++) {
           leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
         }
-      } else {
+     // } else {
         
-      }
+    //  }
 
       Serial.print(fuelVisual_labels[i]);
       Serial.print(": ");

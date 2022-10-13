@@ -142,7 +142,7 @@ void loop() {
       errorCheckData();
       historicalDataHandler();
       printOutHistoricalData();
-      // displayEnergyConsumption();
+      //displayEnergyConsumption();
       displayHistoricalEnergyConsumption();
      
     } else {
