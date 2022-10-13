@@ -119,3 +119,11 @@ void handleTouchEvent(AceButton* button, uint8_t eventType, uint8_t buttonState)
       break;
   }
 }
+
+void startUpButtonHandler() {
+  unsigned long millisNow = millis();
+  while (millis() - millisNow < 3000) {
+    buttonTouch.check();
+  }
+  startup = false;
+}

@@ -285,3 +285,21 @@ void errorCheckData() {
   }
   Serial.println("error check finished");
 }
+
+void dataHandler() {
+  if ((millis() - lastTime) > TIMER_DELAY || firstHistoricalData == true) {
+    if (WiFi.status() == WL_CONNECTED) {
+      getData();
+      calculateEnergyConsumption();
+      errorCheckData();
+      historicalDataHandler();
+      printOutHistoricalData();
+      //displayEnergyConsumption();
+      //displayHistoricalEnergyConsumption();
+
+    } else {
+      Serial.println("WiFi Disconnected");
+    }
+    lastTime = millis();
+  }
+}

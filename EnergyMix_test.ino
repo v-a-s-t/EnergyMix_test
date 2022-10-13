@@ -130,11 +130,7 @@ void setup() {
   getColours();
   ledSetup();
   ledStartupAnimation();
-  unsigned long millisNow = millis();
-  while(millis() - millisNow < 3000){
-    buttonTouch.check();
-  }
-  startup = false;
+  startUpButtonHandler();
   wifiSetup();
   //initHistoricalData();
 }
@@ -142,21 +138,8 @@ void setup() {
 void loop() {
 
   buttonTouch.check();
-  if ((millis() - lastTime) > TIMER_DELAY || firstHistoricalData == true) {
-    if (WiFi.status() == WL_CONNECTED) {
-      getData();
-      calculateEnergyConsumption();
-      errorCheckData();
-      historicalDataHandler();
-      printOutHistoricalData();
-      //displayEnergyConsumption();
-      displayHistoricalEnergyConsumption();
-
-    } else {
-      Serial.println("WiFi Disconnected");
-    }
-    lastTime = millis();
-  }
+  //data handler 
+  dataHandler();  
   displayUpdate();
   ledSend();
 }

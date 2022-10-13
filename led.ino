@@ -83,6 +83,7 @@ void displayHistoricalEnergyConsumption() {
     FastLED.show();
     delay(10);
   }
+  prevLed = millis();
 }
 
 
