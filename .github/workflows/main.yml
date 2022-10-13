@@ -34,6 +34,7 @@ jobs:
           arduino-cli lib install "WiFiManager"
           arduino-cli lib install "ArduinoJson"
           arduino-cli lib install "CSV Parser"
+          arduino-cli lib install "AceButton"
    
       - name: Compile
         run: |
@@ -50,8 +51,8 @@ jobs:
         run: |
           python esp32_binary_merger/merge_bin_esp.py \
             --output_name app-combined.bin \
-            --bin_path /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.3/tools/sdk/esp32/bin/bootloader_dio_80m.bin build/EnergyMix_test.ino.partitions.bin build/EnergyMix_test.ino.bin \
-            --bin_address 0x1000 0x8000 0x10000
+            --bin_path /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.3/tools/sdk/esp32/bin/bootloader_dio_80m.bin build/EnergyMix_test.ino.partitions.bin /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.3/tools/partitions/boot_app0.bin build/EnergyMix_test.ino.bin \
+            --bin_address 0x1000 0x8000 0xe000 0x10000
           mv output/app-combined.bin build/app-combined.bin
           mv build/EnergyMix_test.ino.bin build/app.bin
       - name: Upload artifacts
