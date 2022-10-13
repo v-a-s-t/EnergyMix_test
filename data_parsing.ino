@@ -126,8 +126,14 @@ void CSVBMRS() {
   }
   if (data  != "ERROR") {
     parseCSV(data);
-    for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
-      fuel_MW[i] = getFuelValue(i);
+    if (skipUpdate == false) {
+      for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
+        fuel_MW[i] = getFuelValue(i);
+      }
+    } else {
+      for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
+        fuel_MW[i] = 0;
+      }
     }
   } else {
     Serial.println("Skipping update this time as there was an error with the request");
@@ -169,14 +175,19 @@ void JSONSOLAR() {
 void parseCSV(String dataIn) {
   // data = httpGETRequest("https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&ServiceType=csv", root_ca_bmrs);
   if (dataIn.length() > 100) {
-    dataIn.remove(0, 67);
-    dataIn.remove(dataIn.length() - 8, 7);
+    int indexofFirstLine = dataIn.indexOf('\n');
+    dataIn.remove(0, indexofFirstLine + 1);
+    int indexofLastLine = dataIn.lastIndexOf('\n');
+    dataIn.remove(indexofLastLine, dataIn.length() - indexofLastLine);
+    dataIn.trim();
     Serial.println(dataIn);
     CSV_Parser cp(dataIn.c_str(), /*format*/ "ssLfLfLf", false);
     cp.print();
 
     FuelNames =         (char**)cp[1];
     fuelConsumption =          (int32_t*)cp[2];
+  } else {
+    skipUpdate = true;
   }
 }
 

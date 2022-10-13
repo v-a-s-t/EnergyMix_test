@@ -8,6 +8,7 @@ void pinSetup() {
   touchConfig.setEventHandler(handleTouchEvent);
   touchConfig.setLongPressDelay(LONG_TOUCH);
 
+  buttonTouch.check();
 }
 
 String generateID() {
@@ -100,6 +101,10 @@ void handleTouchEvent(AceButton* button, uint8_t eventType, uint8_t buttonState)
   switch (eventType) {
     case AceButton::kEventPressed:
       Serial.println("TOUCH: pressed");
+      if (startup) {
+        captivePortalAnimation();
+        wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
+      }
       break;
     case AceButton::kEventLongPressed:
       Serial.println("TOUCH: Long pressed");

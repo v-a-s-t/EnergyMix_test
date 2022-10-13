@@ -33,7 +33,7 @@ Preferences prefs;
 
 //Button
 #define CAPTOUCH T7
-#define LONG_TOUCH 2000
+#define LONG_TOUCH 1000
 int TOUCH_THRESHOLD = 60;
 int TOUCH_HYSTERESIS = 20;
 #include <AceButton.h>
@@ -51,6 +51,7 @@ int historicalDataCounter = 0;
 bool firstHistoricalData = true;
 byte fuelArray[HISTORICAL_DATA_POINTS];
 byte historicalDataPoints[NUM_FUEL_VISUALISERS][HISTORICAL_DATA_POINTS];
+
 
 // Touch settings and config
 class CapacitiveConfig: public ButtonConfig {
@@ -122,12 +123,18 @@ CRGB leds[TOTAL_LEDS];
 //captive portal variables
 String wifiName;
 bool isCaptivePortal = false;
+bool startup = true;
 
 void setup() {
   pinSetup();
   getColours();
   ledSetup();
   ledStartupAnimation();
+  unsigned long millisNow = millis();
+  while(millis() - millisNow < 3000){
+    buttonTouch.check();
+  }
+  startup = false;
   wifiSetup();
   //initHistoricalData();
 }
@@ -144,7 +151,7 @@ void loop() {
       printOutHistoricalData();
       //displayEnergyConsumption();
       displayHistoricalEnergyConsumption();
-     
+
     } else {
       Serial.println("WiFi Disconnected");
     }

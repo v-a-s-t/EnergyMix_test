@@ -44,7 +44,7 @@ void displayHistoricalEnergyConsumption() {
   int elementAmount = 0;
   int endingPoint = 0;
   populateHistoricalDataArray();
-  for(int i = 0; i < TOTAL_LEDS; i++){
+  for (int i = 0; i < TOTAL_LEDS; i++) {
     leds[i] = CRGB(0, 0, 0);
   }
   for (int k = HISTORICAL_DATA_POINTS - 1; k > 0; k --) {
@@ -57,22 +57,22 @@ void displayHistoricalEnergyConsumption() {
       elementAmount = historicalDataPoints[i][k];
       endingPoint = endingPoint + elementAmount;
       //if (endingPoint >= startingPoint) {
-        if (i > 0 && i < NUM_FUEL_VISUALISERS) {
-          //if needs padding inbetween
-          for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
-            //make sure the padding leds are turning off
-            leds[ledIndex + OFFSET] = CRGB(0, 0, 0);
-          }
-          //add padding to the starting point
-          startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
-          endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+      if (i > 0 && i < NUM_FUEL_VISUALISERS) {
+        //if needs padding inbetween
+        for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
+          //make sure the padding leds are turning off
+          leds[ledIndex + OFFSET] = CRGB(0, 0, 0);
         }
-        for (int j = startingPoint; j < endingPoint; j++) {
-          leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
-        }
-     // } else {
-        
-    //  }
+        //add padding to the starting point
+        startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+        endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+      }
+      for (int j = startingPoint; j < endingPoint; j++) {
+        leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
+      }
+      // } else {
+
+      //  }
 
       Serial.print(fuelVisual_labels[i]);
       Serial.print(": ");
