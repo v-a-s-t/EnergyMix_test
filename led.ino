@@ -51,37 +51,47 @@ void displayHistoricalEnergyConsumption() {
     startingPoint = 0;
     elementAmount = 0;
     endingPoint = 0;
-    Serial.println("Number of Leds per Element");
+
+    bool isPopulatedDataPoint = false;
     for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
-      startingPoint = endingPoint;
-      elementAmount = historicalDataPoints[i][k];
-      endingPoint = endingPoint + elementAmount;
-      //if (endingPoint >= startingPoint) {
-      if (i > 0 && i < NUM_FUEL_VISUALISERS) {
-        //if needs padding inbetween
-        for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
-          //make sure the padding leds are turning off
-          leds[ledIndex + OFFSET] = CRGB(0, 0, 0);
-        }
-        //add padding to the starting point
-        startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
-        endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+      if (historicalDataPoints[i][k] != 0) {
+        isPopulatedDataPoint = true;
+        break;
       }
-      for (int j = startingPoint; j < endingPoint; j++) {
-        leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
-      }
-      // } else {
-
-      //  }
-
-      Serial.print(fuelVisual_labels[i]);
-      Serial.print(": ");
-      Serial.print(startingPoint + 1);
-      Serial.print("----" );
-      Serial.println(endingPoint);
     }
-    FastLED.show();
-    delay(10);
+    if (isPopulatedDataPoint) {
+      Serial.println("Number of Leds per Element");
+      for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+        startingPoint = endingPoint;
+        elementAmount = historicalDataPoints[i][k];
+        endingPoint = endingPoint + elementAmount;
+        //if (endingPoint >= startingPoint) {
+        if (i > 0 && i < NUM_FUEL_VISUALISERS) {
+          //if needs padding inbetween
+          for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
+            //make sure the padding leds are turning off
+            leds[ledIndex + OFFSET] = CRGB(0, 0, 0);
+          }
+          //add padding to the starting point
+          startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+          endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+        }
+        for (int j = startingPoint; j < endingPoint; j++) {
+          leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
+        }
+        // } else {
+
+        //  }
+
+        Serial.print(fuelVisual_labels[i]);
+        Serial.print(": ");
+        Serial.print(startingPoint + 1);
+        Serial.print("----" );
+        Serial.println(endingPoint);
+      }
+      FastLED.show();
+      delay(10);
+    }
   }
   prevLed = millis();
 }
