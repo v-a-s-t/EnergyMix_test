@@ -4,7 +4,7 @@
     - Clean up
 */
 
-//#define XML
+#define XML
 //#define USE_CA_CERT
 #define NUM_FUEL_TYPES 19
 #define NUM_FUEL_VISUALISERS 7

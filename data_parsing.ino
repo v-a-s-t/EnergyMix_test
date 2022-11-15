@@ -49,6 +49,7 @@ const char* serverSolar = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/
 #ifdef XML
 String serverBMRS = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&FuelType=";
 String serverBMRS_end = "&ServiceType=xml";
+String serverBMRSALL = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&ServiceType=xml";
 #else
 const char* serverBMRS_CSV = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&ServiceType=csv";
 #endif
@@ -93,13 +94,39 @@ int parseXMLtoInt(String dataIn) {
   const char* output = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" )->FirstChildElement( "item" )->FirstChildElement( "currentMW" )->GetText();
   return atoi(output);
 }
+
+int parseALLXMLtoInt(String dataIn) {
+  if (xmlDocument.Parse(dataIn.c_str()) != XML_SUCCESS) {
+    Serial.println("Error");
+    return 0;
+  }
+  tinyxml2::XMLElement *levelElement = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" );
+  //const char* output = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" )->FirstChildElement( "item" )->FirstChildElement( "currentMW" )->GetText();
+  tinyxml2::XMLElement* child;
+  for (child = levelElement->FirstChildElement(); child != NULL; child = child->NextSiblingElement())
+  {
+    const char* out = child->FirstChildElement("fuelType")->GetText();
+    Serial.println(out);
+    for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
+      if (BMRS_fuelTypes[i] == String(out)) {
+        Serial.println("match xml to data");
+        fuel_MW[i] = atoi(child->FirstChildElement("currentMW")->GetText());
+        Serial.print(out);
+        Serial.print(": ");
+        Serial.println(fuel_MW[i]);
+      }
+    }
+    // do something with each child element
+  }
+  return 1;
+}
 #endif
 
 bool skipUpdate = false;
 #ifdef XML
 void XMLBMRS() {
   //Parse XML data from BMRS
-  for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
+  /*for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
     String serverOut = serverBMRS + BMRS_fuelTypes[i];
     serverOut = serverOut + serverBMRS_end;
     data = httpGETRequest(serverOut.c_str(), root_ca_bmrs);
@@ -110,6 +137,20 @@ void XMLBMRS() {
     }
     // Serial.println(data);
     fuel_MW[i] = parseXMLtoInt(data);
+    }
+  */
+  String serverOut = serverBMRSALL;
+  data = httpGETRequest(serverOut.c_str(), root_ca_bmrs);
+  if (data == "ERROR") {
+    //quick retry...
+    Serial.println("retrying to send request");
+    delay(2000);
+    data = httpGETRequest(serverOut.c_str(), root_ca_bmrs);
+  }
+  if (parseALLXMLtoInt(data) != 0) {
+    Serial.println("XML Parse success!");
+  } else {
+    Serial.println("XML Parse Fail");
   }
 }
 #else
