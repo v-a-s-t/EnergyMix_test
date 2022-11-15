@@ -33,7 +33,7 @@ enum fuelTypes {
 
 #include <ArduinoJson.h>
 #ifdef XML
-#include "tinyxml2/tinyxml2.h"
+#include "src/tinyxml2/tinyxml2.h"
 using namespace tinyxml2;
 XMLDocument xmlDocument;
 #else
