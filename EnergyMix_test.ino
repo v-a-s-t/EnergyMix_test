@@ -33,7 +33,7 @@ Preferences prefs;
 
 //Button
 #define CAPTOUCH T7
-#define LONG_TOUCH 1000
+#define LONG_TOUCH 5000
 int TOUCH_THRESHOLD = 60;
 int TOUCH_HYSTERESIS = 20;
 #include <AceButton.h>
@@ -41,10 +41,10 @@ using namespace ace_button;
 
 //Timer
 unsigned long lastTime = 0;
-#define TIMER_DELAY 300000 //5 minutes
+#define TIMER_DELAY 600000 //10 minutes
 
 //Historical data
-const int HISTORICAL_DATA_POINTS = 86400 / (TIMER_DELAY / 1000); //24 hours, every 5 minutes
+const int HISTORICAL_DATA_POINTS = 86400 / (TIMER_DELAY / 1000); //24 hours, every 10 minutes
 const int HISTORICAL_DATA_COUNTS_PER_LOG = 60 / (TIMER_DELAY / 60000);
 //int HISTORICAL_DATA_COUNTS_PER_LOG = 1;
 int historicalDataCounter = 0;

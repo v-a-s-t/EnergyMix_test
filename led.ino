@@ -1,4 +1,5 @@
-unsigned long prevLed, ledTime;
+unsigned long prevLed;
+unsigned long ledTime = 50;
 
 void ledSetup() {
   FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, BGR>(leds, TOTAL_LEDS);

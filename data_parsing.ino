@@ -95,7 +95,7 @@ int parseXMLtoInt(String dataIn) {
 }
 #endif
 
-
+bool skipUpdate = false;
 #ifdef XML
 void XMLBMRS() {
   //Parse XML data from BMRS
@@ -113,7 +113,6 @@ void XMLBMRS() {
   }
 }
 #else
-bool skipUpdate = false;
 void CSVBMRS() {
   skipUpdate = false;
   //Parse CSV from BMRS
@@ -201,26 +200,28 @@ uint32_t getFuelValue(int id) {
 
 void calculateEnergyConsumption() {
   //solar, wind, nuclear, hydro, biomass, gas, coal
-  totalEnergy = 0;
-  totalEnergy = fuel_MW[ccgt] + fuel_MW[ocgt] + fuel_MW[coal] + fuel_MW[nuclear] + fuel_MW[wind] + fuel_MW[ps] +  fuel_MW[npshyd] + fuel_MW[biomass] + fuel_MW[solar];
-  fuelVisualiserPercent[led_solar] = float(fuel_MW[solar]) / float(totalEnergy);
-  fuelVisualiserPercent[led_wind] = float(fuel_MW[wind]) / float(totalEnergy);
-  fuelVisualiserPercent[led_nuclear] = float(fuel_MW[nuclear]) / float(totalEnergy);
-  fuelVisualiserPercent[led_hydro] = (float(fuel_MW[npshyd]) +  float(fuel_MW[ps])) / float(totalEnergy);
-  fuelVisualiserPercent[led_biomass] =  float(fuel_MW[biomass]) / float(totalEnergy);
-  fuelVisualiserPercent[led_gas] = (float(fuel_MW[ocgt]) + float(fuel_MW[ccgt])) / float(totalEnergy);
-  fuelVisualiserPercent[led_coal] = float(fuel_MW[coal]) / float(totalEnergy);
-  Serial.print("Total Energy: ");
-  Serial.println(totalEnergy);
-  Serial.println();
-  Serial.println("Fuel Breakdowns in Percentages");
-  for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
-    Serial.print(fuelVisual_labels[i]);
-    Serial.print(": ");
-    fuelUsageInPoints[i] = int((fuelVisualiserPercent[i] * 100.0) + 0.5);
-    Serial.print(fuelUsageInPoints[i]);
-    Serial.println("%");
+  if (skipUpdate == false) {
+    totalEnergy = 0;
+    totalEnergy = fuel_MW[ccgt] + fuel_MW[ocgt] + fuel_MW[coal] + fuel_MW[nuclear] + fuel_MW[wind] + fuel_MW[ps] +  fuel_MW[npshyd] + fuel_MW[biomass] + fuel_MW[solar];
+    fuelVisualiserPercent[led_solar] = float(fuel_MW[solar]) / float(totalEnergy);
+    fuelVisualiserPercent[led_wind] = float(fuel_MW[wind]) / float(totalEnergy);
+    fuelVisualiserPercent[led_nuclear] = float(fuel_MW[nuclear]) / float(totalEnergy);
+    fuelVisualiserPercent[led_hydro] = (float(fuel_MW[npshyd]) +  float(fuel_MW[ps])) / float(totalEnergy);
+    fuelVisualiserPercent[led_biomass] =  float(fuel_MW[biomass]) / float(totalEnergy);
+    fuelVisualiserPercent[led_gas] = (float(fuel_MW[ocgt]) + float(fuel_MW[ccgt])) / float(totalEnergy);
+    fuelVisualiserPercent[led_coal] = float(fuel_MW[coal]) / float(totalEnergy);
+    Serial.print("Total Energy: ");
+    Serial.println(totalEnergy);
     Serial.println();
+    Serial.println("Fuel Breakdowns in Percentages");
+    for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+      Serial.print(fuelVisual_labels[i]);
+      Serial.print(": ");
+      fuelUsageInPoints[i] = int((fuelVisualiserPercent[i] * 100.0) + 0.5);
+      Serial.print(fuelUsageInPoints[i]);
+      Serial.println("%");
+      Serial.println();
+    }
   }
 }
 
@@ -287,7 +288,7 @@ void errorCheckData() {
 }
 
 void dataHandler() {
-  if ((millis() - lastTime) > TIMER_DELAY || firstHistoricalData == true) {
+  if (((millis() - lastTime) > TIMER_DELAY) || firstHistoricalData == true) {
     if (WiFi.status() == WL_CONNECTED) {
       getData();
       calculateEnergyConsumption();

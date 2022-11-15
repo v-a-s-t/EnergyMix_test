@@ -94,6 +94,8 @@ int getGlobalBrightness() {
   return brightness;
 }
 
+bool isLongPress = false;
+
 // button functions
 void handleTouchEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   Serial.println(button->getId());
@@ -103,16 +105,25 @@ void handleTouchEvent(AceButton* button, uint8_t eventType, uint8_t buttonState)
       Serial.println("TOUCH: pressed");
       if (startup) {
         captivePortalAnimation();
+        wifiName = "EnergyMix-" + generateID();
         wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
       }
       break;
     case AceButton::kEventLongPressed:
       Serial.println("TOUCH: Long pressed");
-      captivePortalAnimation();
-      wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
+      isLongPress = true;
+      initHistoricalData();
+      ESP.restart();
+      //captivePortalAnimation();
+      //wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
       break;
     case AceButton::kEventReleased:
       Serial.println("TOUCH: released");
+      if (isLongPress == false) {
+        captivePortalAnimation();
+        wm.startConfigPortal(wifiName.c_str(), "solar-wind-hydro");
+        isLongPress = false;
+      }
       break;
     case AceButton::kEventClicked:
       Serial.println("TOUCH: clicked");
