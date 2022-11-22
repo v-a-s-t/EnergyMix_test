@@ -48,7 +48,7 @@ void displayHistoricalEnergyConsumption() {
   for (int i = 0; i < TOTAL_LEDS; i++) {
     leds[i] = CRGB(0, 0, 0);
   }
-  for (int k = HISTORICAL_DATA_POINTS - 1; k > 0; k --) {
+  for (int k = HISTORICAL_DATA_POINTS - 1; k >= 0; k --) {
     startingPoint = 0;
     elementAmount = 0;
     endingPoint = 0;

@@ -57,7 +57,7 @@ const char* serverBMRS_CSV = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?AP
 // 8 fuels from BMRS and 1 from solar report
 String BMRS_fuelTypes[NUM_FUEL_TYPES - 1] = {"CCGT", "OCGT", "OIL", "COAL", "NUCLEAR", "WIND", "PS", "NPSHYD", "OTHER", "INTFR", "INTIRL", "INTNED", "INTEW", "BIOMASS", "INTNEM", "INTELEC", "INTIFA2", "INTNSL"};
 uint32_t fuel_MW[NUM_FUEL_TYPES];
-double totalEnergy;
+int32_t totalEnergy;
 float fuel_percent[NUM_FUEL_TYPES];
 
 uint32_t parseJSONtoInt(String dataIn) {
@@ -247,9 +247,9 @@ void calculateEnergyConsumption() {
     fuelVisualiserPercent[led_solar] = float(fuel_MW[solar]) / float(totalEnergy);
     fuelVisualiserPercent[led_wind] = float(fuel_MW[wind]) / float(totalEnergy);
     fuelVisualiserPercent[led_nuclear] = float(fuel_MW[nuclear]) / float(totalEnergy);
-    fuelVisualiserPercent[led_hydro] = (float(fuel_MW[npshyd]) +  float(fuel_MW[ps])) / float(totalEnergy);
+    fuelVisualiserPercent[led_hydro] = float(fuel_MW[npshyd] + fuel_MW[ps]) / float(totalEnergy);
     fuelVisualiserPercent[led_biomass] =  float(fuel_MW[biomass]) / float(totalEnergy);
-    fuelVisualiserPercent[led_gas] = (float(fuel_MW[ocgt]) + float(fuel_MW[ccgt])) / float(totalEnergy);
+    fuelVisualiserPercent[led_gas] = float(fuel_MW[ocgt] + fuel_MW[ccgt]) / float(totalEnergy);
     fuelVisualiserPercent[led_coal] = float(fuel_MW[coal]) / float(totalEnergy);
     Serial.print("Total Energy: ");
     Serial.println(totalEnergy);
