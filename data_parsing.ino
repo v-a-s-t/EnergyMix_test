@@ -100,25 +100,31 @@ int parseALLXMLtoInt(String dataIn) {
     Serial.println("Error");
     return 0;
   }
-  tinyxml2::XMLElement *levelElement = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" );
-  //const char* output = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" )->FirstChildElement( "item" )->FirstChildElement( "currentMW" )->GetText();
-  tinyxml2::XMLElement* child;
-  for (child = levelElement->FirstChildElement(); child != NULL; child = child->NextSiblingElement())
-  {
-    const char* out = child->FirstChildElement("fuelType")->GetText();
-    Serial.println(out);
-    for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
-      if (BMRS_fuelTypes[i] == String(out)) {
-        Serial.println("match xml to data");
-        fuel_MW[i] = atoi(child->FirstChildElement("currentMW")->GetText());
-        Serial.print(out);
-        Serial.print(": ");
-        Serial.println(fuel_MW[i]);
+  const char* httpCode = xmlDocument.FirstChildElement( "responsemetadata" )->FirstChildElement( "httpcode" )->GetText();
+  if (httpCode == "200") {
+    tinyxml2::XMLElement *levelElement = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" );
+    //const char* output = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" )->FirstChildElement( "item" )->FirstChildElement( "currentMW" )->GetText();
+    tinyxml2::XMLElement* child;
+    for (child = levelElement->FirstChildElement(); child != NULL; child = child->NextSiblingElement())
+    {
+      const char* out = child->FirstChildElement("fuelType")->GetText();
+      Serial.println(out);
+      for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
+        if (BMRS_fuelTypes[i] == String(out)) {
+          Serial.println("match xml to data");
+          fuel_MW[i] = atoi(child->FirstChildElement("currentMW")->GetText());
+          Serial.print(out);
+          Serial.print(": ");
+          Serial.println(fuel_MW[i]);
+        }
       }
+      // do something with each child element
     }
-    // do something with each child element
+    return 1;
+  } else {
+    Serial.println("parsing error!");
+    return 0;
   }
-  return 1;
 }
 #endif
 
