@@ -94,6 +94,21 @@ int getGlobalBrightness() {
   return brightness;
 }
 
+void setPadding(int padding) {
+  prefs.begin("colours");
+  prefs.putUInt("padding", padding);
+  prefs.end();
+  updatePadding();
+}
+
+int getPadding() {
+  int _padding;
+  prefs.begin("colours");
+  _padding = prefs.getUInt("padding", 0);
+  prefs.end();
+  return _padding;
+}
+
 bool isLongPress = false;
 
 // button functions

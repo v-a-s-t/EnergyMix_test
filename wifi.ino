@@ -30,6 +30,12 @@ String httpGETRequest(const char* serverName, const char* rootCert) {
 }
 void setupParameters() {
 
+//padding  parameter
+  const char* paddingHTML = "<br/><p> Padding pixels (Default 3px): </p><input type='range' name='padding' min='0' max='5' value='3' oninput='this.nextElementSibling.value = this.value'><output>3</output>";
+  new (&PADDINGPX) WiFiManagerParameter(paddingHTML); // custom html input
+  wm.addParameter(&PADDINGPX);
+
+
   //Global brightness parameter
   const char* globalBrightnessHTML = "<br/><p> Global Brightness (Default 100): </p><input type='range' name='global' min='0' max='255' value='100' oninput='this.nextElementSibling.value = this.value'><output>100</output>";
   new (&GLOBALBRIGHTNESS) WiFiManagerParameter(globalBrightnessHTML); // custom html input
@@ -126,6 +132,10 @@ void saveParamCallback() {
   int gb = getParam("global").toInt();
   if (gb != 0) {
     setGlobalBrightness(gb);
+  }
+   int pd = getParam("padding").toInt();
+  if (pd != getPadding()) {
+    setPadding(pd);
   }
   getColours();
   ESP.restart();

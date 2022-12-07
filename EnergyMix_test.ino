@@ -17,6 +17,7 @@
 WiFiManager wm;
 WiFiManagerParameter RGBParams[NUM_FUEL_VISUALISERS]; // global param ( for non blocking w params )
 WiFiManagerParameter GLOBALBRIGHTNESS; // global param ( for non blocking w params )
+WiFiManagerParameter PADDINGPX; // global param ( for non blocking w params )
 
 #include <Preferences.h>
 Preferences prefs;
@@ -25,10 +26,12 @@ Preferences prefs;
 #include <FastLED.h>
 #define DATA_PIN 13
 #define CLOCK_PIN 14
-#define NUM_LEDS_IN_VISUAL 100
-#define PADDING 21 // 3 leds inbetween each energy
+#define NUM_LEDS 122
+int PADDING_PER_ENERGY = 3; // padding inbetween energies 
+int PADDING = (PADDING_PER_ENERGY*NUM_FUEL_VISUALISERS);
 #define OFFSET 1 // start offset
-#define TOTAL_LEDS NUM_LEDS_IN_VISUAL+PADDING+OFFSET
+int NUM_LEDS_IN_VISUAL = NUM_LEDS - (PADDING + OFFSET); //Number of leds that are used in visualisation
+#define TOTAL_LEDS NUM_LEDS // Number of leds total
 
 
 //Button
@@ -128,6 +131,7 @@ bool startup = true;
 void setup() {
   pinSetup();
   getColours();
+  updatePadding();
   ledSetup();
   ledStartupAnimation();
   startUpButtonHandler();

@@ -64,7 +64,7 @@ void displayHistoricalEnergyConsumption() {
       Serial.println("Number of Leds per Element");
       for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
         startingPoint = endingPoint;
-        elementAmount = historicalDataPoints[i][k];
+        elementAmount =  uint32_t(((historicalDataPoints[i][k] / 100.0) * NUM_LEDS_IN_VISUAL) + 0.5);
         endingPoint = endingPoint + elementAmount;
         //if (endingPoint >= startingPoint) {
         if (i > 0 && i < NUM_FUEL_VISUALISERS) {
@@ -133,4 +133,10 @@ void captivePortalAnimation() {
     FastLED.show();
   }
   FastLED.clear();
+}
+
+void updatePadding() {
+   PADDING_PER_ENERGY = getPadding(); // padding inbetween energies
+   PADDING = (PADDING_PER_ENERGY * NUM_FUEL_VISUALISERS);
+   NUM_LEDS_IN_VISUAL = NUM_LEDS - (PADDING + OFFSET); //Number of leds that are used in visualisation
 }
