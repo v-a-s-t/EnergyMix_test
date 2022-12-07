@@ -4,15 +4,11 @@
     - Clean up
 */
 
-#define PENDULUM
-
 #define XML
 //#define USE_CA_CERT
 #define NUM_FUEL_TYPES 19
 #define NUM_FUEL_VISUALISERS 7
 #include "certs.h"
-#include <time.h>
-#include <TimeLib.h>
 
 
 #include <WiFi.h>
@@ -36,9 +32,6 @@ int PADDING = (PADDING_PER_ENERGY*NUM_FUEL_VISUALISERS);
 #define OFFSET 1 // start offset
 int NUM_LEDS_IN_VISUAL = NUM_LEDS - (PADDING + OFFSET); //Number of leds that are used in visualisation
 #define TOTAL_LEDS NUM_LEDS // Number of leds total
-
-//24hr previous time based on latest sensor reading from solar API
-String historicalTimeSolar,historicalTimeBMRS;
 
 
 //Button
@@ -92,12 +85,6 @@ int LED_BRIGHTNESS = 40;
 #define MAXBRIGHTNESS 100
 float fuelVisualiserPercent[NUM_FUEL_VISUALISERS];
 byte fuelUsageInPoints[NUM_FUEL_VISUALISERS];
-
-#ifdef PENDULUM
-float fuelVisualiserPercent24[NUM_FUEL_VISUALISERS];
-byte fuelUsageInPoints24[NUM_FUEL_VISUALISERS];
-#endif
-
 
 enum fuelVisuals {
   led_solar,
