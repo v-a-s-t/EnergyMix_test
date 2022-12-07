@@ -100,9 +100,14 @@ int parseALLXMLtoInt(String dataIn) {
     Serial.println("Error");
     return 0;
   }
-  const char* httpCode = xmlDocument.FirstChildElement( "responsemetadata" )->FirstChildElement( "httpcode" )->GetText();
-  if (httpCode == "200") {
-    tinyxml2::XMLElement *levelElement = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" );
+  tinyxml2::XMLElement * p_root_element = xmlDocument.RootElement();
+  tinyxml2::XMLElement* levelElement2 = p_root_element->FirstChildElement()->FirstChildElement();
+  const char* httpCode = levelElement2->GetText();
+  if (httpCode == std::string("200")) {
+    Serial.println("http code 200");
+    tinyxml2::XMLElement *levelElement = p_root_element->FirstChildElement("responseBody")->FirstChildElement("responseList");
+    // levelElement = levelElement->FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" );
+
     //const char* output = xmlDocument.FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" )->FirstChildElement( "item" )->FirstChildElement( "currentMW" )->GetText();
     tinyxml2::XMLElement* child;
     for (child = levelElement->FirstChildElement(); child != NULL; child = child->NextSiblingElement())
