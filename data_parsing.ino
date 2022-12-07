@@ -46,6 +46,11 @@ String data;
 float solarMW;
 //https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0
 const char* serverSolar = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0";
+String serverSolar_history = "https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0?start=";
+String solar_history_url, bmrs_history_url;
+String serverBMRS_history = "https://api.bmreports.com/BMRS/FUELINST/V1?APIKey=e0bs40fsmoq6elz&FromDateTime=";
+//https://api.bmreports.com/BMRS/FUELINST/V1?APIKey=e0bs40fsmoq6elz&FromDateTime=2022-12-07%2015:30:00&ToDateTime=2022-12-07%2015:30:00%20&ServiceType=xml
+//https://api0.solar.sheffield.ac.uk/pvlive/api/v4/pes/0?start=2022-12-06T07:00:00&end=2022-12-06T07:00:00
 #ifdef XML
 String serverBMRS = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?APIKey=e0bs40fsmoq6elz&FuelType=";
 String serverBMRS_end = "&ServiceType=xml";
@@ -57,6 +62,10 @@ const char* serverBMRS_CSV = "https://api.bmreports.com/BMRS/FUELINSTHHCUR/V1?AP
 // 8 fuels from BMRS and 1 from solar report
 String BMRS_fuelTypes[NUM_FUEL_TYPES - 1] = {"CCGT", "OCGT", "OIL", "COAL", "NUCLEAR", "WIND", "PS", "NPSHYD", "OTHER", "INTFR", "INTIRL", "INTNED", "INTEW", "BIOMASS", "INTNEM", "INTELEC", "INTIFA2", "INTNSL"};
 uint32_t fuel_MW[NUM_FUEL_TYPES];
+
+#ifdef PENDULUM
+uint32_t fuel_MW_24[NUM_FUEL_TYPES];
+#endif
 int32_t totalEnergy;
 float fuel_percent[NUM_FUEL_TYPES];
 
@@ -75,7 +84,10 @@ uint32_t parseJSONtoInt(String dataIn) {
   uint32_t data_0_0 = data_0[0]; // 0
   const char* data_0_1 = data_0[1]; // "2022-02-24T10:30:00Z"
   uint32_t data_0_2 = data_0[2]; // 1
-  //set24hrPreviousTime(data_0_1);
+#ifdef PENDULUM
+  Serial.println(data_0_1);
+  set24hrPreviousTimeSolar(data_0_1);
+#endif
 
   JsonArray meta = doc["meta"];
   const char* meta_0 = meta[0]; // "ggd_id"
@@ -105,6 +117,10 @@ int parseALLXMLtoInt(String dataIn) {
   const char* httpCode = levelElement2->GetText();
   if (httpCode == std::string("200")) {
     Serial.println("http code 200");
+#ifdef PENDULUM
+    Serial.println(p_root_element->FirstChildElement("responseBody")->FirstChildElement("dataLastUpdated")->GetText());
+    set24hrPreviousTimeBMRS(p_root_element->FirstChildElement("responseBody")->FirstChildElement("dataLastUpdated")->GetText());
+#endif
     tinyxml2::XMLElement *levelElement = p_root_element->FirstChildElement("responseBody")->FirstChildElement("responseList");
     // levelElement = levelElement->FirstChildElement( "response" )->FirstChildElement( "responseBody" )->FirstChildElement( "responseList" );
 
@@ -131,25 +147,31 @@ int parseALLXMLtoInt(String dataIn) {
     return 0;
   }
 }
+#ifdef PENDULUM
+int parseALL24XMLtoInt(String dataIn) {
+  if (xmlDocument.Parse(dataIn.c_str()) != XML_SUCCESS) {
+    Serial.println("Error");
+    return 0;
+  }
+  tinyxml2::XMLElement * p_root_element_24 = xmlDocument.RootElement();
+  tinyxml2::XMLElement* levelElement2_24 = p_root_element_24->FirstChildElement()->FirstChildElement();
+  const char* httpCode = levelElement2_24->GetText();
+  if (httpCode == std::string("200")) {
+    Serial.println("http code 200");
+    tinyxml2::XMLElement *levelElement_24 = p_root_element_24->FirstChildElement("responseBody")->FirstChildElement("responseList")->FirstChildElement("item");
+    for (int i = 0 ; i < NUM_FUEL_TYPES - 1; i++) {
+      fuel_MW_24[i] = atoi(levelElement_24->FirstChildElement(BMRS_fuelTypes[i].c_str())->GetText());
+    }
+  }
+  return 1;
+}
+#endif
 #endif
 
 bool skipUpdate = false;
 #ifdef XML
 void XMLBMRS() {
   //Parse XML data from BMRS
-  /*for (byte i = 0; i < NUM_FUEL_TYPES - 1; i ++) {
-    String serverOut = serverBMRS + BMRS_fuelTypes[i];
-    serverOut = serverOut + serverBMRS_end;
-    data = httpGETRequest(serverOut.c_str(), root_ca_bmrs);
-    if (data == "ERROR") {
-      //quick retry...
-      delay(2000);
-      data = httpGETRequest(serverOut.c_str(), root_ca_bmrs);
-    }
-    // Serial.println(data);
-    fuel_MW[i] = parseXMLtoInt(data);
-    }
-  */
   String serverOut = serverBMRSALL;
   data = httpGETRequest(serverOut.c_str(), root_ca_bmrs);
   if (data == "ERROR") {
@@ -163,6 +185,20 @@ void XMLBMRS() {
   } else {
     Serial.println("XML Parse Fail");
   }
+#ifdef PENDULUM
+  data = httpGETRequest(historicalTimeBMRS.c_str(), root_ca_bmrs);
+  if (data == "ERROR") {
+    //quick retry...
+    Serial.println("retrying to send request");
+    delay(2000);
+    data = httpGETRequest(historicalTimeBMRS.c_str(), root_ca_bmrs);
+  }
+  if (parseALL24XMLtoInt(data) != 0) {
+    Serial.println("XML Parse 24 hour data success!");
+  } else {
+    Serial.println("XML Parse 24 hour data Fail");
+  }
+#endif
 }
 #else
 void CSVBMRS() {
@@ -274,6 +310,30 @@ void calculateEnergyConsumption() {
       Serial.println("%");
       Serial.println();
     }
+#ifdef PENDULUM
+    totalEnergy = 0;
+    totalEnergy = fuel_MW_24[ccgt] + fuel_MW_24[ocgt] + fuel_MW_24[coal] + fuel_MW_24[nuclear] + fuel_MW_24[wind] + fuel_MW_24[ps] +  fuel_MW_24[npshyd] + fuel_MW_24[biomass] + fuel_MW_24[solar];
+    fuelVisualiserPercent24[led_solar] = float(fuel_MW_24[solar]) / float(totalEnergy);
+    fuelVisualiserPercent24[led_wind] = float(fuel_MW_24[wind]) / float(totalEnergy);
+    fuelVisualiserPercent24[led_nuclear] = float(fuel_MW_24[nuclear]) / float(totalEnergy);
+    fuelVisualiserPercent24[led_hydro] = float(fuel_MW_24[npshyd] + fuel_MW_24[ps]) / float(totalEnergy);
+    fuelVisualiserPercent24[led_biomass] =  float(fuel_MW_24[biomass]) / float(totalEnergy);
+    fuelVisualiserPercent24[led_gas] = float(fuel_MW_24[ocgt] + fuel_MW_24[ccgt]) / float(totalEnergy);
+    fuelVisualiserPercent24[led_coal] = float(fuel_MW_24[coal]) / float(totalEnergy);
+    Serial.print("Total Energy 24: ");
+    Serial.println(totalEnergy);
+    Serial.println();
+    Serial.println("Fuel Breakdowns in Percentages 24 hrs ago");
+    for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+      Serial.print(fuelVisual_labels[i]);
+      Serial.print(": ");
+      fuelUsageInPoints24[i] = int((fuelVisualiserPercent24[i] * 100.0) + 0.5);
+      Serial.print(fuelUsageInPoints24[i]);
+      Serial.println("%");
+      Serial.println();
+    }
+#endif
+
   }
 }
 
@@ -346,7 +406,9 @@ void dataHandler() {
       calculateEnergyConsumption();
       errorCheckData();
       historicalDataHandler();
+#ifndef PENDULUM
       printOutHistoricalData();
+#endif
       //displayEnergyConsumption();
       //displayHistoricalEnergyConsumption();
 

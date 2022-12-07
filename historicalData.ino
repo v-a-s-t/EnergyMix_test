@@ -71,10 +71,5 @@ void historicalDataHandler() {
     Serial.println("Saving new historical data!");
     updateHistoricalData(fuelUsageInPoints);
     firstHistoricalData = false;
-    // }
-    // historicalDataCounter++;
-    // if (historicalDataCounter == HISTORICAL_DATA_COUNTS_PER_LOG) {
-    //   historicalDataCounter = 0 ;
-    // }
   }
 }
