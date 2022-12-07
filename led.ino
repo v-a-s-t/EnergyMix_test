@@ -161,6 +161,49 @@ void displayPendulum() {
   Serial.println("Number of Leds per Element");
   for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
     startingPoint = endingPoint;
+    elementAmount =  uint32_t(((fuelUsageInPoints24[i] / 100.0) * NUM_LEDS_IN_VISUAL) + 0.5);
+    endingPoint = endingPoint + elementAmount;
+    //if (endingPoint >= startingPoint) {
+    if (i > 0 && i < NUM_FUEL_VISUALISERS) {
+      //if needs padding inbetween
+      for (int ledIndex = startingPoint; ledIndex < startingPoint + (PADDING / NUM_FUEL_VISUALISERS); ledIndex++) {
+        //make sure the padding leds are turning off
+        leds[ledIndex + OFFSET] = CRGB(0, 0, 0);
+      }
+      //add padding to the starting point
+      startingPoint = startingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+      endingPoint = endingPoint + (PADDING / NUM_FUEL_VISUALISERS);
+    }
+    for (int j = startingPoint; j < endingPoint; j++) {
+      leds[j + OFFSET] = CRGB(fuelColours[i][0], fuelColours[i][1], fuelColours[i][2]);
+    }
+    // } else {
+
+    //  }
+
+    Serial.print(fuelVisual_labels[i]);
+    Serial.print(": ");
+    Serial.print(startingPoint + 1);
+    Serial.print("----" );
+    Serial.println(endingPoint);
+  }
+  FastLED.show();
+  delay(2000);
+
+  startingPoint = 0;
+  elementAmount = 0;
+  endingPoint = 0;
+  for (int i = 0; i < TOTAL_LEDS; i++) {
+    leds[i] = CRGB(0, 0, 0);
+  }
+  startingPoint = 0;
+  elementAmount = 0;
+  endingPoint = 0;
+
+
+  Serial.println("Number of Leds per Element");
+  for (byte i = 0; i < NUM_FUEL_VISUALISERS; i ++) {
+    startingPoint = endingPoint;
     elementAmount =  uint32_t(((fuelUsageInPoints[i] / 100.0) * NUM_LEDS_IN_VISUAL) + 0.5);
     endingPoint = endingPoint + elementAmount;
     //if (endingPoint >= startingPoint) {

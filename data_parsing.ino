@@ -250,9 +250,28 @@ void JSONSOLAR() {
         skipUpdate = true;
       }
     }
+#ifdef PENDULUM
+    //Parse JSON from solar
+    data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
+    if (data == "ERROR") {
+      //quick retry...
+      delay(2000);
+      data = httpGETRequest(solar_history_url.c_str(), root_ca_solar);
+    }
+    if (data != "ERROR") {
+      // Serial.println(data);
+      fuel_MW_24[NUM_FUEL_TYPES - 1] = parseJSONtoInt(data);
+    } else {
+      for (byte i = 0; i < NUM_FUEL_TYPES; i ++) {
+        fuel_MW_24[i] = 0;
+        skipUpdate = true;
+      }
+    }
+#endif
   } else {
     for (byte i = 0; i < NUM_FUEL_TYPES; i ++) {
       fuel_MW[i] = 0;
+      fuel_MW_24[i] = 0;
     }
   }
 }
